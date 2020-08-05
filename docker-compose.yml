@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  urlshort:
+    container_name: urlshort
+    restart: on-failure
+    build: ./urlshort
+    ports:
+      - "8000:8000"
+    command: gunicorn app:app -b 0.0.0.0:8000
+  
+  nginx:
+    container_name: nginx
+    restart: on-failure
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - urlshort
