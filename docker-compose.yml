@@ -8,7 +8,7 @@ services:
     ports:
       - "8000:8000"
     command: gunicorn app:app -b 0.0.0.0:8000
-  
+
   nginx:
     container_name: nginx
     restart: on-failure
@@ -17,3 +17,23 @@ services:
       - "80:80"
     depends_on:
       - urlshort
+
+  selenium:
+    image: selenium/standalone-chrome-debug
+    ports:
+      - 4444:4444
+      - 5900:5900
+
+  unit-tests:
+    volumes:
+      - "./urlshort:/urlshort"
+    build:
+      context: ./urlshort
+      dockerfile: /home/centos/url_shortener/urlshort/spec/rspec.dockerfile
+    environment:
+      SELENIUM_HOST: selenium
+      SELENIUM_PORT: 4444
+    entrypoint: rspec
+    command:
+      - --pattern
+      - /urlshort/spec/unit/*_spec.rb
